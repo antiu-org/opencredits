@@ -1,0 +1,43 @@
+# Source files
+src/**
+**/*.ts
+**/*.map
+.gitignore
+
+# Development files
+.vscode/**
+!.vscode/launch.json
+!.vscode/tasks.json
+.eslintrc.json
+tsconfig.json
+tslint.json
+
+# Build files
+**/*.vsix
+
+# Dependencies (keep only production dependencies)
+node_modules/**
+!node_modules/axios/**
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+
+# Test files
+test/**
+**/*.test.js
+
+# Documentation not needed in package
+.clinerules/**
+
+# Other
+.env*
+coverage/
