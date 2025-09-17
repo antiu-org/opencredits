@@ -2,6 +2,20 @@
 
 All notable changes to the "OpenCredits" extension will be documented in this file.
 
+## [1.0.2] - 2025-09-17
+
+### Added
+- **SEO Optimization**: Enhanced README for VS Code Marketplace discoverability
+- **Marketplace Badges**: Added version, downloads, and license badges
+- **FAQ Section**: Added comprehensive FAQ with keyword-rich questions
+- **Enhanced Content**: Expanded README with 63% more content for better search ranking
+
+### Improved
+- **Keyword Optimization**: Strategic placement of "OpenRouter", "credits", "balance", "usage" keywords
+- **Visual Enhancement**: Updated screenshot alt text with SEO-friendly descriptions
+- **User Benefits**: Added "Why Use OpenCredits?" section highlighting key advantages
+- **Search Rankings**: Optimized for marketplace searches like "OpenRouter credits" and "balance tracker"
+
 ## [1.0.1] - 2025-09-17
 
 ### Added

@@ -2,7 +2,7 @@
   "name": "opencredits",
   "displayName": "OpenCredits",
   "description": "Monitor OpenRouter API credits in VS Code status bar",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "antiu",
   "icon": "logo.jpeg",
   "engines": {
