@@ -1,9 +1,9 @@
 {
   "name": "opencredits",
   "displayName": "OpenCredits",
-  "description": "Monitor API credits for OpenRouter, OpenAI, Anthropic, and Gemini in VS Code status bar",
-  "version": "0.1.0",
-  "publisher": "alexandruantiu",
+  "description": "Monitor OpenRouter API credits in VS Code status bar",
+  "version": "1.0.0",
+  "publisher": "antiu",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -12,12 +12,10 @@
   ],
   "keywords": [
     "openrouter",
-    "openai",
-    "anthropic",
-    "gemini",
     "credits",
     "api",
-    "status"
+    "status",
+    "monitoring"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -58,21 +56,6 @@
           "default": false,
           "description": "Enable OpenRouter credit monitoring"
         },
-        "opencredits.providers.openai.enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable OpenAI credit monitoring"
-        },
-        "opencredits.providers.anthropic.enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Anthropic credit monitoring"
-        },
-        "opencredits.providers.gemini.enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Gemini credit monitoring"
-        },
         "opencredits.showInStatusBar": {
           "type": "boolean",
           "default": true,
@@ -92,20 +75,21 @@
   "devDependencies": {
     "@types/vscode": "^1.74.0",
     "@types/node": "16.x",
+    "@types/node-fetch": "^2.6.4",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "axios": "^1.6.0"
+    "node-fetch": "^2.7.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/antiuconsulting/opencredits.git"
   },
   "author": "Alexandru Antiu",
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
   "bugs": {
     "url": "https://github.com/antiuconsulting/opencredits/issues"
   },

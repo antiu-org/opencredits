@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import axios, { AxiosResponse } from "axios";
+import fetch, { Response } from "node-fetch";
 import { ICreditProvider, CreditInfo } from "../interfaces/ICreditProvider";
 
 export abstract class BaseProvider implements ICreditProvider {
@@ -35,14 +35,19 @@ export abstract class BaseProvider implements ICreditProvider {
     url: string,
     headers: Record<string, string>,
     timeout: number = 10000
-  ): Promise<AxiosResponse> {
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
     try {
-      const response = await axios.get(url, {
+      const response = await fetch(url, {
         headers,
-        timeout,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       return response;
     } catch (error) {
+      clearTimeout(timeoutId);
       this.logError(`API request failed for ${this.getName()}`, error);
       throw error;
     }
@@ -76,18 +81,16 @@ export abstract class BaseProvider implements ICreditProvider {
   protected handleApiError(error: any): CreditInfo {
     let errorMessage = "Unknown error";
 
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 401) {
-        errorMessage = "Invalid API key";
-      } else if (error.response?.status === 429) {
-        errorMessage = "Rate limit exceeded";
-      } else if (error.code === "ECONNABORTED") {
+    if (error instanceof Error) {
+      if (error.name === "AbortError") {
         errorMessage = "Request timeout";
+      } else if (error.message.includes("401")) {
+        errorMessage = "Invalid API key";
+      } else if (error.message.includes("429")) {
+        errorMessage = "Rate limit exceeded";
       } else {
         errorMessage = error.message || "Network error";
       }
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
     }
 
     this.logError("API error", error);

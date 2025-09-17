@@ -42,13 +42,17 @@ export class OpenRouterProvider extends BaseProvider {
         }
       );
 
-      if (response.status === 200 && response.data) {
-        this.logInfo("API key validation successful");
-        return true;
-      } else {
-        this.logError("API key validation failed", response.data);
-        return false;
+      if (response.status === 200) {
+        const data = await response.json();
+        if (data) {
+          this.logInfo("API key validation successful");
+          return true;
+        }
       }
+
+      const errorData = await response.json().catch(() => null);
+      this.logError("API key validation failed", errorData);
+      return false;
     } catch (error) {
       this.logError("API key validation error", error);
       return false;
@@ -69,48 +73,98 @@ export class OpenRouterProvider extends BaseProvider {
 
       this.logInfo("Fetching credits from OpenRouter");
 
+      // 1) Try the official credits endpoint first: remaining = total_credits - total_usage
+      try {
+        const creditsResp = await this.makeApiRequest(
+          "https://openrouter.ai/api/v1/credits",
+          {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/antiu-org/opencredits",
+            "X-Title": "OpenCredits VS Code Extension",
+          }
+        );
+
+        if (creditsResp.status === 200) {
+          const body = await creditsResp.json();
+          const data = body?.data || body;
+          const totalCredits = Number(data?.total_credits);
+          const totalUsage = Number(data?.total_usage);
+
+          if (Number.isFinite(totalCredits) && Number.isFinite(totalUsage)) {
+            const remaining = Math.max(0, totalCredits - totalUsage);
+            const balanceNumeric = remaining;
+            const currency = "$";
+            const balance = this.formatCurrency(balanceNumeric, currency);
+
+            this.logInfo(
+              `Credits fetched successfully from /credits: ${balance}`
+            );
+
+            return {
+              balance,
+              balanceNumeric,
+              currency,
+              lastUpdated: new Date(),
+            };
+          }
+        } else {
+          this.logInfo(
+            `OpenRouter /credits returned status ${creditsResp.status}, falling back to /auth/key`
+          );
+        }
+      } catch (e) {
+        this.logInfo(
+          "OpenRouter /credits call failed, falling back to /auth/key"
+        );
+      }
+
+      // 2) Fallback to /auth/key (handles prepaid or PAYG display)
       const response = await this.makeApiRequest(
         "https://openrouter.ai/api/v1/auth/key",
         {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://github.com/antiuconsulting/opencredits",
+          "HTTP-Referer": "https://github.com/antiu-org/opencredits",
           "X-Title": "OpenCredits VS Code Extension",
         }
       );
 
-      if (response.status === 200 && response.data) {
-        const data = response.data.data || response.data;
+      if (response.status === 200) {
+        const responseData = await response.json();
+        const data = responseData.data || responseData;
 
-        // OpenRouter API returns credit information in the data object
+        // Prefer prepaid if present; otherwise show PAYG
         let balance = "Unknown";
         let balanceNumeric = 0;
         const currency = "$";
 
-        if (data.usage) {
-          // If usage information is available
-          const usage = data.usage;
-          if (typeof usage === "number") {
-            balanceNumeric = Math.max(0, (data.limit || 0) - usage);
+        const creditLeft = data?.credit_left;
+        const balanceField = data?.balance;
+        const limitRaw = data?.limit;
+        const usageRaw = data?.usage;
+
+        const isFiniteNumber = (v: any) =>
+          typeof v === "number" && Number.isFinite(v);
+
+        if (creditLeft !== undefined && creditLeft !== null) {
+          const n = Number(creditLeft);
+          if (Number.isFinite(n)) {
+            balanceNumeric = n;
             balance = this.formatCurrency(balanceNumeric, currency);
           }
-        } else if (data.credit_left !== undefined) {
-          // If credit_left is available
-          balanceNumeric = parseFloat(data.credit_left) || 0;
-          balance = this.formatCurrency(balanceNumeric, currency);
-        } else if (data.balance !== undefined) {
-          // If balance is directly available
-          balanceNumeric = parseFloat(data.balance) || 0;
-          balance = this.formatCurrency(balanceNumeric, currency);
-        } else if (data.limit !== undefined && data.usage !== undefined) {
-          // Calculate remaining from limit and usage
-          const limit = parseFloat(data.limit) || 0;
-          const used = parseFloat(data.usage) || 0;
-          balanceNumeric = Math.max(0, limit - used);
+        } else if (balanceField !== undefined && balanceField !== null) {
+          const n = Number(balanceField);
+          if (Number.isFinite(n)) {
+            balanceNumeric = n;
+            balance = this.formatCurrency(balanceNumeric, currency);
+          }
+        } else if (isFiniteNumber(limitRaw) && isFiniteNumber(usageRaw)) {
+          const remaining = Math.max(0, Number(limitRaw) - Number(usageRaw));
+          balanceNumeric = remaining;
           balance = this.formatCurrency(balanceNumeric, currency);
         } else {
-          // Fallback: show that we have a valid key but can't determine balance
-          balance = "Connected";
+          balance = "PAYG";
         }
 
         this.logInfo(`Credits fetched successfully: ${balance}`);
@@ -122,7 +176,8 @@ export class OpenRouterProvider extends BaseProvider {
           lastUpdated: new Date(),
         };
       } else {
-        this.logError("Invalid response from OpenRouter API", response.data);
+        const errorData = await response.json().catch(() => null);
+        this.logError("Invalid response from OpenRouter API", errorData);
         return this.handleApiError(new Error("Invalid API response"));
       }
     } catch (error) {

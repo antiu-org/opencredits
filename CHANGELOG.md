@@ -2,48 +2,50 @@
 
 All notable changes to the "OpenCredits" extension will be documented in this file.
 
-## [0.1.0] - 2025-01-06
+## [1.0.0] - 2025-01-17
 
 ### Added
-- Initial release of OpenCredits extension
-- OpenRouter provider with full credit monitoring support
-- Status bar integration with configurable display formats
-- Secure API key storage using VS Code SecretStorage
-- Configurable update intervals (1 minute to 24 hours)
-- Command palette integration for configuration
-- Real-time credit refresh functionality
-- Provider enable/disable toggles
-- Smart status bar display based on number of enabled providers
-- Comprehensive error handling and logging
-- Automatic periodic updates with manual refresh option
+- **Initial Release** of OpenCredits extension
+- **OpenRouter Provider**: Full implementation with comprehensive credit monitoring
+  - Uses official `/api/v1/credits` endpoint to compute remaining balance as `total_credits - total_usage`
+  - Displays balance in dollars in the status bar
+  - Handles Pay-As-You-Go accounts by displaying "PAYG" when no prepaid credits are available
+  - Graceful fallback logic via `/api/v1/auth/key` when `/credits` endpoint is unavailable
+  - API key validation and comprehensive error handling
 
-### Providers
-- ✅ OpenRouter - Full implementation with credit fetching
-- 🚧 OpenAI - Stub implementation (coming in future release)
-- 🚧 Anthropic - Stub implementation (coming in future release)
-- 🚧 Gemini - Stub implementation (coming in future release)
+### Features
+- **Status Bar Integration**: Real-time credit display with smart formatting
+- **Secure API Key Storage**: Uses VS Code's built-in SecretStorage for maximum security
+- **Configurable Update Intervals**: Choose from 1 minute to 24 hours (default: 5 minutes)
+- **Command Palette Integration**: Easy access to configuration and refresh functions
+- **Real-time Credit Refresh**: Manual refresh capability with automatic periodic updates
+- **Provider Enable/Disable Toggles**: Granular control over which providers to monitor
+- **Comprehensive Error Handling**: Robust error management with detailed logging
+- **Automatic Periodic Updates**: Set-and-forget credit monitoring
 
 ### Commands
 - `OpenCredits: Refresh Credits` - Manually refresh credit information
 - `OpenCredits: Configure Providers` - Open configuration interface
 
-### Configuration
-- `opencredits.updateInterval` - Set update frequency
+### Configuration Options
+- `opencredits.updateInterval` - Set update frequency (1 minute to 24 hours)
 - `opencredits.showInStatusBar` - Toggle status bar display
-- `opencredits.providers.*.enabled` - Enable/disable specific providers
+- `opencredits.providers.openrouter.enabled` - Enable/disable OpenRouter monitoring
+
+### Technical Implementation
+- **Modern HTTP Client**: Uses node-fetch for reliable API communication
+- **Optimized Dependencies**: Minimal runtime footprint with carefully selected dependencies
+- **TypeScript**: Full type safety throughout the codebase
+- **VS Code API Integration**: Native integration with VS Code's extension ecosystem
+- **Secure HTTPS Communication**: All API requests use encrypted connections
+- **No Sensitive Data Logging**: API keys and sensitive information are never logged
 
 ### Security
-- API keys stored in VS Code SecretStorage
-- Secure HTTPS API communication
+- API keys stored securely in VS Code SecretStorage
+- Secure HTTPS API communication with official provider endpoints
 - No logging of sensitive information
+- Proper error sanitization before display
 
-## [Unreleased]
+## Future Releases
 
-### Planned
-- Full OpenAI provider implementation
-- Full Anthropic provider implementation  
-- Full Gemini provider implementation
-- Usage tracking and analytics
-- Credit alerts and notifications
-- More granular refresh controls
-- Export functionality for credit history
+Support for additional providers (OpenAI, Anthropic, Gemini) will be added in future releases based on user demand and API availability.

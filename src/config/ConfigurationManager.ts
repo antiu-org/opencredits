@@ -173,12 +173,7 @@ export class ConfigurationManager {
   }
 
   private async showApiKeyConfiguration(): Promise<void> {
-    const providers = [
-      { name: "OpenRouter", id: "openrouter" },
-      { name: "OpenAI", id: "openai" },
-      { name: "Anthropic", id: "anthropic" },
-      { name: "Gemini", id: "gemini" },
-    ];
+    const providers = [{ name: "OpenRouter", id: "openrouter" }];
 
     const items: vscode.QuickPickItem[] = [];
     for (const provider of providers) {

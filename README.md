@@ -1,35 +1,33 @@
 # OpenCredits
 
-Monitor API credits for OpenRouter, OpenAI, Anthropic, and Gemini directly in your VS Code status bar.
+Monitor your OpenRouter API credits directly in your VS Code status bar.
 
 ## Features
 
-- **Real-time Credit Monitoring**: Track your API credits from multiple providers in one place
+- **Real-time Credit Monitoring**: Track your OpenRouter API credits in real-time
 - **Status Bar Integration**: See your credits at a glance in VS Code's status bar
 - **Secure API Key Storage**: API keys are stored securely using VS Code's built-in SecretStorage
 - **Configurable Updates**: Choose how often to update credit information (1 minute to 24 hours)
-- **Multiple Providers**: Support for OpenRouter, OpenAI, Anthropic, and Gemini (more coming soon)
-- **Smart Display**: Automatically adjusts display format based on number of enabled providers
+- **Smart Display**: Shows remaining balance with intelligent formatting for different account types
+- **Pay-As-You-Go Support**: Displays "PAYG" for pay-as-you-go accounts without prepaid credits
 
 ## Supported Providers
 
-- ✅ **OpenRouter** - Full implementation
-- 🚧 **OpenAI** - Coming soon
-- 🚧 **Anthropic** - Coming soon  
-- 🚧 **Gemini** - Coming soon
+- ✅ **OpenRouter** - Full implementation with comprehensive credit monitoring
 
 ## Installation
 
-1. Install from VS Code Marketplace (coming soon)
-2. Or install from VSIX file: `code --install-extension opencredits-0.1.0.vsix`
+1. Install from VS Code Marketplace
+2. Or install from VSIX file: `code --install-extension opencredits-1.0.0.vsix`
 
 ## Quick Start
 
 1. Install the extension
 2. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
 3. Run `OpenCredits: Configure Providers`
-4. Add your API keys for desired providers
-5. Credits will appear in the status bar!
+4. Add your OpenRouter API key
+5. Enable OpenRouter monitoring
+6. Your credits will appear in the status bar!
 
 ## Usage
 
@@ -41,9 +39,9 @@ Monitor API credits for OpenRouter, OpenAI, Anthropic, and Gemini directly in yo
 
 ### Status Bar Display
 
-- **Single provider**: `OpenRouter: $5.20`
-- **Two providers**: `OR: $5.20 | OA: $10.50`
-- **Three+ providers**: `OR: $5.20 | OA: $10.50 | AN: 1.2M`
+- **With Credits**: `OpenRouter: $5.20` - Shows remaining balance in dollars
+- **Pay-As-You-Go**: `OpenRouter: PAYG` - For accounts without prepaid credits
+- **Error State**: `OpenRouter: Error` - When there's an issue fetching credits
 
 ### Commands
 
@@ -56,24 +54,41 @@ Monitor API credits for OpenRouter, OpenAI, Anthropic, and Gemini directly in yo
 |---------|-------------|---------|
 | `opencredits.updateInterval` | How often to update credits | `5 minutes` |
 | `opencredits.showInStatusBar` | Show credits in status bar | `true` |
-| `opencredits.providers.*.enabled` | Enable specific providers | `false` |
+| `opencredits.providers.openrouter.enabled` | Enable OpenRouter monitoring | `false` |
+
+## How It Works
+
+OpenCredits connects to OpenRouter's official API endpoints:
+
+- **Primary**: Uses `/api/v1/credits` endpoint to calculate remaining balance as `total_credits - total_usage`
+- **Fallback**: Uses `/api/v1/auth/key` for validation when credits endpoint is unavailable
+- **Smart Detection**: Automatically detects Pay-As-You-Go accounts and displays appropriate status
 
 ## Security
 
 - API keys are stored securely using VS Code's SecretStorage
-- Keys are never logged or transmitted except to official provider APIs
+- Keys are never logged or transmitted except to official OpenRouter APIs
 - All API requests use HTTPS with proper authentication headers
+- No sensitive information is included in error messages or logs
 
 ## Requirements
 
 - VS Code 1.74.0 or higher
 - Internet connection for API calls
-- Valid API keys from supported providers
+- Valid OpenRouter API key
 
-## Known Issues
+## Troubleshooting
 
-- OpenAI, Anthropic, and Gemini providers are not yet implemented
-- Rate limiting may cause temporary display errors
+### Credits Not Showing
+1. Ensure OpenRouter is enabled in settings
+2. Verify your API key is correct
+3. Check your internet connection
+4. Use "Refresh Credits" command
+
+### Error States
+- **Network Error**: Check internet connection
+- **Invalid API Key**: Verify key in configuration
+- **Rate Limited**: Wait and try again later
 
 ## Contributing
 
@@ -82,20 +97,26 @@ Monitor API credits for OpenRouter, OpenAI, Anthropic, and Gemini directly in yo
 3. Make your changes
 4. Submit a pull request
 
+## Roadmap
+
+Future versions may include:
+- Support for additional API providers
+- Usage analytics and trends
+- Credit alerts and notifications
+- Historical usage tracking
+
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+Creative Commons Attribution-NonCommercial 4.0 International License - see [LICENSE](LICENSE) file for details.
 
-## Changelog
-
-### 0.1.0
-- Initial release
-- OpenRouter provider support
-- Status bar integration
-- Configuration UI
-- Automatic updates
+**Free for personal and educational use. Commercial use requires permission.**
 
 ## Support
 
-- [Report Issues](https://github.com/antiuconsulting/opencredits/issues)
-- [Documentation](https://github.com/antiuconsulting/opencredits)
+- [Report Issues](https://github.com/antiu-org/opencredits/issues)
+- [Documentation](https://github.com/antiu-org/opencredits)
+- [Changelog](CHANGELOG.md)
+
+---
+
+**Note**: This extension focuses exclusively on OpenRouter credit monitoring. Support for additional providers may be added in future releases based on user demand and API availability.

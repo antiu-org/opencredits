@@ -17,7 +17,10 @@ tslint.json
 
 # Dependencies (keep only production dependencies)
 node_modules/**
-!node_modules/axios/**
+!node_modules/node-fetch/**
+!node_modules/whatwg-url/**
+!node_modules/tr46/**
+!node_modules/webidl-conversions/**
 
 # Logs
 *.log

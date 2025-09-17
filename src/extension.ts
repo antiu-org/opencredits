@@ -2,9 +2,6 @@ import * as vscode from "vscode";
 import { ConfigurationManager } from "./config/ConfigurationManager";
 import { StatusBarManager } from "./statusBar/StatusBarManager";
 import { OpenRouterProvider } from "./providers/OpenRouterProvider";
-import { OpenAIProvider } from "./providers/OpenAIProvider";
-import { AnthropicProvider } from "./providers/AnthropicProvider";
-import { GeminiProvider } from "./providers/GeminiProvider";
 import {
   ICreditProvider,
   CreditInfo,
@@ -36,16 +33,11 @@ export class OpenCreditsExtension {
   }
 
   private initializeProviders(): void {
-    this.providers = [
-      new OpenRouterProvider(this.context, this.outputChannel),
-      new OpenAIProvider(this.context, this.outputChannel),
-      new AnthropicProvider(this.context, this.outputChannel),
-      new GeminiProvider(this.context, this.outputChannel),
-    ];
+    this.providers = [new OpenRouterProvider(this.context, this.outputChannel)];
 
     this.statusBarManager.setProviders(this.providers);
     this.outputChannel.appendLine(
-      `Initialized ${this.providers.length} providers`
+      `Initialized ${this.providers.length} provider`
     );
   }
 
