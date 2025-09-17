@@ -2,8 +2,9 @@
   "name": "opencredits",
   "displayName": "OpenCredits",
   "description": "Monitor OpenRouter API credits in VS Code status bar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "antiu",
+  "icon": "logo.jpeg",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -86,12 +87,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antiuconsulting/opencredits.git"
+    "url": "git+https://github.com/antiu-org/opencredits.git"
   },
   "author": "Alexandru Antiu",
   "license": "CC-BY-NC-4.0",
   "bugs": {
-    "url": "https://github.com/antiuconsulting/opencredits/issues"
+    "url": "https://github.com/antiu-org/opencredits/issues"
   },
-  "homepage": "https://github.com/antiuconsulting/opencredits#readme"
+  "homepage": "https://github.com/antiu-org/opencredits#readme"
 }

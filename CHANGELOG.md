@@ -2,6 +2,18 @@
 
 All notable changes to the "OpenCredits" extension will be documented in this file.
 
+## [1.0.1] - 2025-09-17
+
+### Added
+- **Visual Enhancements**: Added extension icon and screenshot showcase
+- **Documentation**: Enhanced README with visual demonstration
+- **Repository Migration**: Moved to antiu-org organization
+
+### Technical
+- Improved marketplace presentation with visual assets
+- Updated all repository references to new organization
+- Maintained API attribution headers for potential OpenRouter partnerships
+
 ## [1.0.0] - 2025-01-17
 
 ### Added

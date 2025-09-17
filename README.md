@@ -11,6 +11,10 @@ Monitor your OpenRouter API credits directly in your VS Code status bar.
 - **Smart Display**: Shows remaining balance with intelligent formatting for different account types
 - **Pay-As-You-Go Support**: Displays "PAYG" for pay-as-you-go accounts without prepaid credits
 
+## Screenshot
+
+![OpenCredits in action](screenshot.png)
+
 ## Supported Providers
 
 - ✅ **OpenRouter** - Full implementation with comprehensive credit monitoring
