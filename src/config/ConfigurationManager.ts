@@ -42,6 +42,11 @@ export class ConfigurationManager {
     };
   }
 
+  public getConsumptionRatePeriod(): number {
+    const config = vscode.workspace.getConfiguration("opencredits");
+    return config.get<number>("consumptionRatePeriod", 60); // Default to 60 minutes
+  }
+
   public isProviderEnabled(providerId: string): boolean {
     const config = vscode.workspace.getConfiguration("opencredits");
     return config.get<boolean>(`providers.${providerId}.enabled`, false);
@@ -82,6 +87,15 @@ export class ConfigurationManager {
     );
   }
 
+  public async setConsumptionRatePeriod(period: number): Promise<void> {
+    const config = vscode.workspace.getConfiguration("opencredits");
+    await config.update(
+      "consumptionRatePeriod",
+      period,
+      vscode.ConfigurationTarget.Global
+    );
+  }
+
   public async getApiKey(providerId: string): Promise<string | undefined> {
     const key = `opencredits.${providerId}.apiKey`;
     return await this.context.secrets.get(key);
@@ -105,7 +119,7 @@ export class ConfigurationManager {
   public onConfigurationChanged(
     callback: (e: vscode.ConfigurationChangeEvent) => void
   ): vscode.Disposable {
-    return vscode.workspace.onDidChangeConfiguration((e) => {
+    return vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
       if (e.affectsConfiguration("opencredits")) {
         callback(e);
       }
@@ -148,6 +162,10 @@ export class ConfigurationManager {
         description: "Change how often credits are updated",
       },
       {
+        label: "$(pulse) Consumption Rate Period",
+        description: "Change consumption rate calculation period",
+      },
+      {
         label: "$(eye) Toggle Status Bar",
         description: "Show or hide credits in status bar",
       },
@@ -164,6 +182,9 @@ export class ConfigurationManager {
           break;
         case "$(settings-gear) Update Interval":
           await this.showUpdateIntervalConfiguration();
+          break;
+        case "$(pulse) Consumption Rate Period":
+          await this.showConsumptionRatePeriodConfiguration();
           break;
         case "$(eye) Toggle Status Bar":
           await this.toggleStatusBar();
@@ -228,6 +249,30 @@ export class ConfigurationManager {
       await this.setUpdateInterval(selected.label);
       vscode.window.showInformationMessage(
         `Update interval set to ${selected.label}`
+      );
+    }
+  }
+
+  private async showConsumptionRatePeriodConfiguration(): Promise<void> {
+    const currentPeriod = this.getConsumptionRatePeriod();
+    
+    const periodInput = await vscode.window.showInputBox({
+      prompt: "Enter consumption rate period in minutes (1-1440)",
+      value: currentPeriod.toString(),
+      validateInput: (value: string) => {
+        const num = parseInt(value, 10);
+        if (isNaN(num) || num < 1 || num > 1440) {
+          return "Please enter a number between 1 and 1440";
+        }
+        return null;
+      }
+    });
+
+    if (periodInput) {
+      const period = parseInt(periodInput, 10);
+      await this.setConsumptionRatePeriod(period);
+      vscode.window.showInformationMessage(
+        `Consumption rate period set to ${period} minutes`
       );
     }
   }

@@ -22,6 +22,7 @@
 - **Configurable Updates**: Choose how often to update credit information (1 minute to 24 hours)
 - **Smart Display**: Shows remaining balance with intelligent formatting for different account types
 - **Pay-As-You-Go Support**: Displays "PAYG" for pay-as-you-go accounts without prepaid credits
+- **Consumption Rate Tracking**: See how fast you're consuming credits with configurable period tracking
 
 ## OpenRouter Credit Monitor in Action
 
@@ -56,6 +57,7 @@
 ### Status Bar Display
 
 - **With Credits**: `OpenRouter: $5.20` - Shows remaining balance in dollars
+- **With Consumption Rate**: `OpenRouter: $5.20 (-$0.50/hr)` - Shows balance and consumption rate
 - **Pay-As-You-Go**: `OpenRouter: PAYG` - For accounts without prepaid credits
 - **Error State**: `OpenRouter: Error` - When there's an issue fetching credits
 
@@ -69,6 +71,7 @@
 | Setting | Description | Default |
 |---------|-------------|---------|
 | `opencredits.updateInterval` | How often to update credits | `5 minutes` |
+| `opencredits.consumptionRatePeriod` | Period in minutes for consumption rate calculation | `60` |
 | `opencredits.showInStatusBar` | Show credits in status bar | `true` |
 | `opencredits.providers.openrouter.enabled` | Enable OpenRouter monitoring | `false` |
 
@@ -79,6 +82,7 @@ OpenCredits connects to OpenRouter's official API endpoints to provide accurate 
 - **Primary**: Uses `/api/v1/credits` endpoint to calculate remaining balance as `total_credits - total_usage`
 - **Fallback**: Uses `/api/v1/auth/key` for validation when credits endpoint is unavailable
 - **Smart Detection**: Automatically detects Pay-As-You-Go accounts and displays appropriate status
+- **Consumption Tracking**: Calculates credit consumption rate over a configurable period
 
 ## Security
 
@@ -110,6 +114,12 @@ OpenCredits connects to OpenRouter's official API endpoints to provide accurate 
 
 ### How often does OpenCredits check my OpenRouter balance?
 By default, OpenCredits checks your OpenRouter credits every 5 minutes. You can configure this interval from 1 minute to 24 hours in the extension settings.
+
+### How does the consumption rate tracking work?
+OpenCredits tracks your credit balance over time and calculates the rate at which you're consuming credits. By default, it calculates consumption over a 60-minute period, but this can be configured.
+
+### Can I configure the consumption rate period?
+Yes! You can set the period over which consumption rate is calculated from 1 minute to 1440 minutes (24 hours) in the extension settings.
 
 ### Does OpenCredits work with OpenRouter pay-as-you-go accounts?
 Yes! OpenCredits automatically detects pay-as-you-go accounts and displays "PAYG" in the status bar when no prepaid credits are available.

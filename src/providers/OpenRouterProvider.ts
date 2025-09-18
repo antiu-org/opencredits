@@ -3,6 +3,9 @@ import { BaseProvider } from "./base/BaseProvider";
 import { CreditInfo } from "./interfaces/ICreditProvider";
 
 export class OpenRouterProvider extends BaseProvider {
+  // Store historical data for consumption rate calculation
+  private historicalData: Array<{ timestamp: Date; balance: number }> = [];
+
   constructor(
     context: vscode.ExtensionContext,
     outputChannel: vscode.OutputChannel
@@ -101,12 +104,8 @@ export class OpenRouterProvider extends BaseProvider {
               `Credits fetched successfully from /credits: ${balance}`
             );
 
-            return {
-              balance,
-              balanceNumeric,
-              currency,
-              lastUpdated: new Date(),
-            };
+            // Add to historical data and calculate consumption rate
+            return this.processCreditData(balance, balanceNumeric, currency);
           }
         } else {
           this.logInfo(
@@ -169,12 +168,8 @@ export class OpenRouterProvider extends BaseProvider {
 
         this.logInfo(`Credits fetched successfully: ${balance}`);
 
-        return {
-          balance,
-          balanceNumeric,
-          currency,
-          lastUpdated: new Date(),
-        };
+        // Add to historical data and calculate consumption rate
+        return this.processCreditData(balance, balanceNumeric, currency);
       } else {
         const errorData = await response.json().catch(() => null);
         this.logError("Invalid response from OpenRouter API", errorData);
@@ -184,5 +179,85 @@ export class OpenRouterProvider extends BaseProvider {
       this.logError("Failed to fetch credits", error);
       return this.handleApiError(error);
     }
+  }
+
+  private processCreditData(
+    balance: string,
+    balanceNumeric: number,
+    currency: string
+  ): CreditInfo {
+    const now = new Date();
+
+    // Add current data to historical data
+    this.historicalData.push({
+      timestamp: now,
+      balance: balanceNumeric,
+    });
+
+    // Clean up old data (keep only last 24 hours)
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    this.historicalData = this.historicalData.filter(
+      (data) => data.timestamp >= twentyFourHoursAgo
+    );
+
+    // Calculate consumption rate
+    const consumptionRate = this.calculateConsumptionRate();
+
+    return {
+      balance,
+      balanceNumeric,
+      currency,
+      lastUpdated: now,
+      historicalData: this.historicalData,
+      consumptionRate,
+    };
+  }
+
+  private calculateConsumptionRate(): number | undefined {
+    // Get the consumption rate period from configuration
+    const config = vscode.workspace.getConfiguration("opencredits");
+    const periodMinutes = config.get<number>("consumptionRatePeriod", 60);
+
+    if (this.historicalData.length < 2) {
+      return undefined; // Not enough data to calculate rate
+    }
+
+    const now = new Date();
+    const periodAgo = new Date(now.getTime() - periodMinutes * 60 * 1000);
+
+    // Find the most recent data point
+    const latestData = this.historicalData[this.historicalData.length - 1];
+
+    // Find the data point closest to our period ago time
+    let baselineData = this.historicalData[0];
+    let minTimeDiff = Math.abs(
+      baselineData.timestamp.getTime() - periodAgo.getTime()
+    );
+
+    for (const data of this.historicalData) {
+      const timeDiff = Math.abs(data.timestamp.getTime() - periodAgo.getTime());
+      if (timeDiff < minTimeDiff) {
+        minTimeDiff = timeDiff;
+        baselineData = data;
+      }
+    }
+
+    // If we don't have data from the required period, use the oldest available data
+    if (baselineData.timestamp > periodAgo && this.historicalData.length > 1) {
+      baselineData = this.historicalData[0];
+    }
+
+    // Calculate consumption rate (credits consumed per hour)
+    const timeDiffHours =
+      (latestData.timestamp.getTime() - baselineData.timestamp.getTime()) /
+      (1000 * 60 * 60);
+    if (timeDiffHours <= 0) {
+      return undefined;
+    }
+
+    const creditDiff = baselineData.balance - latestData.balance; // Positive means consumption
+    const ratePerHour = creditDiff / timeDiffHours;
+
+    return ratePerHour;
   }
 }
