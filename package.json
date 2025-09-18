@@ -61,6 +61,13 @@
           "type": "boolean",
           "default": true,
           "description": "Show credits in status bar"
+        },
+        "opencredits.consumptionRatePeriod": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "maximum": 1440,
+          "description": "Period in minutes over which to calculate consumption rate (1-1440 minutes)"
         }
       }
     }

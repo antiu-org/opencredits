@@ -102,9 +102,12 @@ export class StatusBarManager {
     }
 
     if (validCredits.length === 1) {
-      // Single provider: "OpenRouter: $5.20"
+      // Single provider: "OpenRouter: $5.20" or "OpenRouter: $5.20 (-$0.50/hr)"
       const { provider, credit } = validCredits[0];
-      return `${provider.getName()}: ${credit.balance}`;
+      const consumptionRateText = this.formatConsumptionRate(credit);
+      return consumptionRateText
+        ? `${provider.getName()}: ${credit.balance} (${consumptionRateText})`
+        : `${provider.getName()}: ${credit.balance}`;
     } else if (validCredits.length === 2) {
       // Two providers: "OR: $5.20 | OA: $10.50"
       return validCredits
@@ -122,6 +125,20 @@ export class StatusBarManager {
             `${provider.getShortName()}: ${credit.balance}`
         )
         .join(" | ");
+    }
+  }
+
+  private formatConsumptionRate(credit: CreditInfo): string | null {
+    if (credit.consumptionRate === undefined || credit.consumptionRate <= 0) {
+      return null;
+    }
+
+    // Format the consumption rate as a currency value per hour
+    const rate = credit.consumptionRate;
+    if (rate < 0.01) {
+      return `-${credit.currency}${rate.toFixed(4)}/hr`;
+    } else {
+      return `-${credit.currency}${rate.toFixed(2)}/hr`;
     }
   }
 
@@ -146,11 +163,22 @@ export class StatusBarManager {
           hasErrors = true;
         } else {
           const lastUpdated = credit.lastUpdated.toLocaleTimeString();
-          lines.push(
-            `${provider.getIcon()} ${provider.getName()}: ${
-              credit.balance
-            } (${lastUpdated})`
-          );
+          let creditLine = `${provider.getIcon()} ${provider.getName()}: ${
+            credit.balance
+          } (${lastUpdated})`;
+
+          // Add consumption rate to tooltip
+          if (
+            credit.consumptionRate !== undefined &&
+            credit.consumptionRate > 0
+          ) {
+            const rateText = this.formatConsumptionRate(credit);
+            if (rateText) {
+              creditLine += ` ${rateText}`;
+            }
+          }
+
+          lines.push(creditLine);
           hasValidCredits = true;
         }
       } else {
