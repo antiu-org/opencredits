@@ -4,6 +4,9 @@ export interface CreditInfo {
   currency: string;
   lastUpdated: Date;
   error?: string;
+  // Consumption rate fields
+  consumptionRate?: number; // Credits consumed per hour
+  historicalData?: Array<{ timestamp: Date; balance: number }>; // Historical balance data
 }
 
 export interface ICreditProvider {
